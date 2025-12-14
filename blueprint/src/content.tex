@@ -44,13 +44,14 @@ A function $D : E(n,d) \to \mathbb{Q}$ is \emph{$S_n$-symmetric} if $D(e \circ \
 \end{definition}
 
 \begin{definition}[Log-Concave Function]\label{def:logconcave}
-\lean{IsLogConcave}
+\lean{SatisfiesLogConcavity}
 \leanok
 \uses{def:weak_composition}
-A function $D : E(n,d) \to \mathbb{Q}$ is \emph{log-concave} if for all $e \in E(n,d)$ and indices $i \neq j$ with $e_i \geq 1$ and $e_j \leq d-1$:
+A function $D : E(n,d) \to \mathbb{Q}$ is \emph{log-concave} if for all $e \in E(n,d)$ and indices $i \neq j$ with $e_i \geq 1$ and $e_j \geq 1$:
 \[
 D(e)^2 \geq D(e - \delta_i + \delta_j) \cdot D(e + \delta_i - \delta_j)
 \]
+(The conditions $e_i \geq 1$ and $e_j \geq 1$ ensure both modified vectors remain in $E(n,d)$.)
 \end{definition}
 
 \begin{definition}[Symmetric Log-Concave Function]\label{def:symmetric_logconcave_function}
