@@ -8,6 +8,7 @@
 /blueprint/web/
 /blueprint/print/
 /blueprint/.lake/
+/blueprint/lean_decls
 
 # LaTeX auxiliary files
 *.aux
@@ -36,3 +37,4 @@ Thumbs.db
 *~
 .vscode/
 .idea/
+*.paux

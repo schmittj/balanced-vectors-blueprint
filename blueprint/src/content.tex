@@ -1,0 +1,121 @@
+\chapter{Balanced Vector Optimization}
+
+\section{Introduction}
+
+This blueprint documents the Lean 4 formalization of a theorem about symmetric log-concave functions on weak compositions. The main result states that such functions are maximized on balanced vectors and minimized on concentrated vectors.
+
+The primary application is to descendant integrals on moduli spaces of curves:
+\[
+\langle \tau_{e_1} \cdots \tau_{e_n} \rangle_g = \int_{\overline{\mathcal{M}}_{g,n}} \psi_1^{e_1} \cdots \psi_n^{e_n}
+\]
+
+\section{Definitions}
+
+\begin{definition}[Weak Composition]\label{def:weak_composition}
+\lean{WeakComposition}
+\leanok
+A \emph{weak composition} of $d$ into $n$ parts is an $n$-tuple $e = (e_1, \ldots, e_n) \in \mathbb{Z}^n$ such that:
+\begin{itemize}
+\item $\sum_{i=1}^n e_i = d$
+\item $e_i \geq 0$ for all $i$
+\end{itemize}
+We denote the set of such tuples by $E(n,d)$.
+\end{definition}
+
+\begin{definition}[Balanced Vector]\label{def:balanced}
+\lean{IsBalanced}
+\leanok
+\uses{def:weak_composition}
+A weak composition $e \in E(n,d)$ is \emph{balanced} if $|e_i - e_j| \leq 1$ for all $i, j \in \{1, \ldots, n\}$.
+\end{definition}
+
+\begin{definition}[Concentrated Vector]\label{def:concentrated}
+\lean{IsConcentrated}
+\leanok
+\uses{def:weak_composition}
+A weak composition $e \in E(n,d)$ is \emph{concentrated} if there exists $k$ such that $e = d \cdot \delta_k$, i.e., all mass is on a single index.
+\end{definition}
+
+\begin{definition}[Symmetric Function]\label{def:symmetric}
+\lean{IsSymmetric}
+\leanok
+\uses{def:weak_composition}
+A function $D : E(n,d) \to \mathbb{Q}$ is \emph{$S_n$-symmetric} if $D(e \circ \sigma^{-1}) = D(e)$ for all permutations $\sigma \in S_n$.
+\end{definition}
+
+\begin{definition}[Log-Concave Function]\label{def:logconcave}
+\lean{IsLogConcave}
+\leanok
+\uses{def:weak_composition}
+A function $D : E(n,d) \to \mathbb{Q}$ is \emph{log-concave} if for all $e \in E(n,d)$ and indices $i \neq j$ with $e_i \geq 1$ and $e_j \leq d-1$:
+\[
+D(e)^2 \geq D(e - \delta_i + \delta_j) \cdot D(e + \delta_i - \delta_j)
+\]
+\end{definition}
+
+\begin{definition}[Symmetric Log-Concave Function]\label{def:symmetric_logconcave_function}
+\lean{SymmetricLogConcaveFunction}
+\leanok
+\uses{def:weak_composition, def:symmetric, def:logconcave}
+A \emph{symmetric log-concave function} on $E(n,d)$ is a function $D : E(n,d) \to \mathbb{Q}$ satisfying:
+\begin{enumerate}
+\item $S_n$-symmetry
+\item Log-concavity
+\item Strict positivity: $D(e) > 0$ for all $e$
+\end{enumerate}
+\end{definition}
+
+\section{Main Results}
+
+\begin{theorem}[Maximized on Balanced]\label{thm:maximized_on_balanced}
+\lean{SymmetricLogConcaveFunction.maximized_on_balanced}
+\leanok
+\uses{def:symmetric_logconcave_function, def:balanced}
+Let $D$ be a symmetric log-concave function on $E(n,d)$. Then $D$ is maximized on balanced vectors: for any $e \in E(n,d)$ and any balanced $b \in E(n,d)$, we have $D(e) \leq D(b)$.
+\end{theorem}
+
+\begin{theorem}[Minimized on Concentrated]\label{thm:minimized_on_concentrated}
+\lean{SymmetricLogConcaveFunction.minimized_on_concentrated}
+\leanok
+\uses{def:symmetric_logconcave_function, def:concentrated}
+Let $D$ be a symmetric log-concave function on $E(n,d)$. Then $D$ is minimized on concentrated vectors: for any $e \in E(n,d)$ and any concentrated $c \in E(n,d)$, we have $D(e) \geq D(c)$.
+\end{theorem}
+
+\begin{theorem}[Main Theorem]\label{thm:main}
+\lean{main_theorem}
+\leanok
+\uses{thm:maximized_on_balanced, thm:minimized_on_concentrated}
+Let $D : E(n,d) \to \mathbb{Q}$ be a function satisfying:
+\begin{enumerate}
+\item $S_n$-symmetry: $D(e \circ \sigma^{-1}) = D(e)$ for all permutations $\sigma$
+\item Log-concavity: $D(e)^2 \geq D(e - \delta_i + \delta_j) \cdot D(e + \delta_i - \delta_j)$
+\item Strict positivity: $D(e) > 0$
+\end{enumerate}
+Then:
+\begin{itemize}
+\item \textbf{Maximum:} $D$ is maximized on balanced vectors
+\item \textbf{Minimum:} $D$ is minimized on concentrated vectors
+\end{itemize}
+\end{theorem}
+
+\section{Key Lemmas}
+
+\begin{lemma}[Unimodal of Log-Concave Palindromic]\label{lem:unimodal}
+\lean{unimodal_of_logconcave_palindromic}
+\leanok
+If a sequence is log-concave and palindromic, then it is unimodal (non-decreasing up to the middle, then non-increasing).
+\end{lemma}
+
+\begin{lemma}[Balanced Maximizes]\label{lem:balanced_maximizes}
+\lean{balanced_maximizes}
+\leanok
+\uses{def:balanced, lem:unimodal}
+For a symmetric log-concave function, balanced vectors achieve the maximum value.
+\end{lemma}
+
+\begin{lemma}[Concentrated Minimizes]\label{lem:concentrated_minimizes}
+\lean{concentrated_minimizes}
+\leanok
+\uses{def:concentrated, lem:unimodal}
+For a symmetric log-concave function, concentrated vectors achieve the minimum value.
+\end{lemma}
