@@ -206,6 +206,8 @@ lemma modify_at_other (e : WeakComposition n d) (i j k : Fin n) (hi : 1 ≤ e i)
 
 end WeakComposition
 
+variable {d : ℤ}
+
 /-! ### Balanced and Concentrated Vectors -/
 
 /-- A vector is balanced if all entries differ by at most 1. -/
