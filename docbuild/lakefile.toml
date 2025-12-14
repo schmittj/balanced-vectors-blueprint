@@ -1,5 +1,6 @@
 name = "docbuild"
 reservoir = false
+packagesDir = "../.lake/packages"
 
 # Depend on the parent project
 [[require]]

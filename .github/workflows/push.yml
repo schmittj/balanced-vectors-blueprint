@@ -35,6 +35,8 @@ jobs:
         run: lake build
 
       - name: Build documentation
+        env:
+          ELAN_TOOLCHAIN: leanprover/lean4:v4.26.0
         run: |
           cd docbuild
           lake build BalancedVectors:docs
