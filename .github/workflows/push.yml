@@ -50,7 +50,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y graphviz graphviz-dev
-          sudo apt-get install -y texlive-xetex texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra texlive-science
+          sudo apt-get install -y latexmk texlive-xetex texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra texlive-science
 
       - name: Install leanblueprint
         run: |
