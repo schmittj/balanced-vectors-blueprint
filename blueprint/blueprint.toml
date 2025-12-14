@@ -1,0 +1,13 @@
+[project]
+name = "Balanced Vector Optimization"
+home_url = "https://github.com/schmittj/balanced-vectors-blueprint"
+
+[lean]
+# Path to the Lean project root (relative to this file)
+project_dir = ".."
+# Name of the Lean library
+library = "BalancedVectors"
+
+[website]
+title = "Balanced Vector Optimization - Lean Blueprint"
+description = "Lean 4 formalization of the theorem that symmetric log-concave functions on weak compositions are maximized on balanced vectors and minimized on concentrated vectors."

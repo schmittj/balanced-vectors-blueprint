@@ -1,0 +1,183 @@
+% Blueprint content for Balanced Vector Optimization
+% This file contains the formal statement and can be included in a larger paper
+
+\documentclass[a4paper,11pt]{article}
+
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{hyperref}
+\usepackage{xcolor}
+
+% Blueprint-specific packages
+\usepackage{blueprint}
+
+% Theorem environments
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{corollary}[theorem]{Corollary}
+
+% Custom commands
+\newcommand{\ZZ}{\mathbb{Z}}
+\newcommand{\QQ}{\mathbb{Q}}
+\newcommand{\NN}{\mathbb{N}}
+\newcommand{\ee}{\mathbf{e}}
+
+\title{Balanced Vector Optimization\\[0.5em]
+\large Lean 4 Formalization Blueprint}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+
+This document provides a formal blueprint for the Lean 4 formalization of the following result:
+symmetric log-concave functions on weak compositions achieve their maximum on balanced vectors
+and their minimum on concentrated vectors.
+
+This abstract theorem captures the key structure used in the proof that descendant integrals
+$\langle \tau_{e_1} \cdots \tau_{e_n} \rangle_g$ on moduli spaces of curves $\overline{\mathcal{M}}_{g,n}$
+are maximized for balanced exponent vectors and minimized for concentrated ones.
+
+\section{Definitions}
+
+\begin{definition}[Weak Composition]\label{def:weak_composition}
+\lean{WeakComposition}\leanok
+A \emph{weak composition} of $d$ into $n$ parts is a vector $\ee = (e_1, \ldots, e_n) \in \ZZ^n$
+such that $\sum_{i=1}^n e_i = d$ and $e_i \geq 0$ for all $i$.
+
+We denote the set of such compositions by $E(n, d)$.
+\end{definition}
+
+\begin{definition}[Balanced Vector]\label{def:balanced}
+\lean{IsBalanced}\leanok
+A vector $\ee \in \ZZ^n$ is \emph{balanced} if $|e_i - e_j| \leq 1$ for all $1 \leq i, j \leq n$.
+
+Equivalently: $e_i \leq e_j + 1$ and $e_j \leq e_i + 1$ for all pairs $i, j$.
+\end{definition}
+
+\begin{definition}[Concentrated Vector]\label{def:concentrated}
+\lean{IsConcentrated}\leanok
+A vector $\ee \in \ZZ^n$ is \emph{concentrated} at index $k$ if $e_k = d$ and $e_i = 0$ for all $i \neq k$.
+
+In other words, $\ee = d \cdot \delta_k$ where $\delta_k$ is the $k$-th standard basis vector.
+\end{definition}
+
+\begin{definition}[Symmetric Function]\label{def:symmetric}
+\lean{IsSymmetric}\leanok
+A function $D : E(n,d) \to \QQ$ is \emph{symmetric} (or $S_n$-invariant) if
+\[
+D(\ee \circ \sigma^{-1}) = D(\ee)
+\]
+for all permutations $\sigma \in S_n$ and all $\ee \in E(n,d)$.
+\end{definition}
+
+\begin{definition}[Log-Concavity Condition]\label{def:log_concave}
+\lean{SatisfiesLogConcavity}\leanok
+A function $D : E(n,d) \to \QQ$ satisfies the \emph{log-concavity condition} if for all
+$\ee \in E(n,d)$ and distinct indices $i \neq j$ with $e_i \geq 1$ and $e_j \geq 1$:
+\[
+D(\ee)^2 \geq D(\ee - \delta_i + \delta_j) \cdot D(\ee + \delta_i - \delta_j)
+\]
+where $\delta_i$ denotes the $i$-th standard basis vector.
+\end{definition}
+
+\begin{definition}[Strict Positivity]\label{def:positive}
+\lean{IsStrictlyPositive}\leanok
+A function $D : E(n,d) \to \QQ$ is \emph{strictly positive} if $D(\ee) > 0$ for all $\ee \in E(n,d)$.
+\end{definition}
+
+\begin{definition}[Symmetric Log-Concave Function]\label{def:slc_function}
+\lean{SymmetricLogConcaveFunction}\leanok
+\uses{def:symmetric, def:log_concave, def:positive}
+A function $D : E(n,d) \to \QQ$ is a \emph{symmetric log-concave function} if it satisfies:
+\begin{enumerate}
+    \item $S_n$-symmetry (Definition~\ref{def:symmetric})
+    \item The log-concavity condition (Definition~\ref{def:log_concave})
+    \item Strict positivity (Definition~\ref{def:positive})
+\end{enumerate}
+\end{definition}
+
+\section{Main Results}
+
+\begin{theorem}[Unimodality of Log-Concave Palindromic Sequences]\label{thm:unimodal}
+\lean{unimodal_of_logconcave_palindromic}\leanok
+Let $s : \ZZ \to \QQ$ be a sequence that is:
+\begin{itemize}
+    \item Positive on $[0, q]$
+    \item Log-concave on $[0, q]$: $s(t)^2 \geq s(t-1) \cdot s(t+1)$ for $1 \leq t \leq q-1$
+    \item Palindromic on $[0, q]$: $s(t) = s(q - t)$ for $0 \leq t \leq q$
+\end{itemize}
+Then $s$ is unimodal on $[0, q]$:
+\begin{itemize}
+    \item $s(t) \leq s(t+1)$ for $t < q/2$ (increasing in first half)
+    \item $s(t) \leq s(t-1)$ for $t > q/2$ (decreasing in second half)
+\end{itemize}
+\end{theorem}
+
+\begin{theorem}[Maximum on Balanced Vectors]\label{thm:max}
+\lean{SymmetricLogConcaveFunction.maximized_on_balanced}\leanok
+\uses{def:slc_function, def:balanced, thm:unimodal}
+Let $D : E(n,d) \to \QQ$ be a symmetric log-concave function. Then for any $\ee \in E(n,d)$,
+there exists a balanced vector $\ee' \in E(n,d)$ such that
+\[
+D(\ee) \leq D(\ee').
+\]
+In particular, $D$ achieves its maximum on a balanced vector.
+\end{theorem}
+
+\begin{theorem}[Minimum on Concentrated Vectors]\label{thm:min}
+\lean{SymmetricLogConcaveFunction.minimized_on_concentrated}\leanok
+\uses{def:slc_function, def:concentrated, thm:unimodal}
+Let $n > 0$, $d \geq 0$, and $D : E(n,d) \to \QQ$ be a symmetric log-concave function.
+Then for any $\ee \in E(n,d)$, there exists a concentrated vector $\ee' \in E(n,d)$ such that
+\[
+D(\ee') \leq D(\ee).
+\]
+In particular, $D$ achieves its minimum on a concentrated vector.
+\end{theorem}
+
+\begin{theorem}[Main Theorem]\label{thm:main}
+\lean{main_theorem}\leanok
+\uses{thm:max, thm:min}
+\proves{thm:main}
+Let $n > 0$, $d \geq 0$, and let $D : E(n,d) \to \QQ$ be a symmetric log-concave function. Then:
+\begin{enumerate}
+    \item[\textup{(a)}] \textbf{Maximum:} $D$ achieves its maximum on balanced vectors.
+    \item[\textup{(b)}] \textbf{Minimum:} $D$ achieves its minimum on concentrated vectors.
+\end{enumerate}
+\end{theorem}
+
+\section{Application to Descendant Integrals}
+
+The main application is to the function $D : E(n, 3g-3+n) \to \QQ$ defined by
+\[
+D(\ee) = \langle \tau_{e_1} \cdots \tau_{e_n} \rangle_g = \int_{\overline{\mathcal{M}}_{g,n}} \psi_1^{e_1} \cdots \psi_n^{e_n}
+\]
+where $\psi_i$ are the cotangent line classes on the moduli space of stable curves.
+
+This function satisfies:
+\begin{itemize}
+    \item \textbf{Symmetry:} The symmetric group $S_n$ acts on $\overline{\mathcal{M}}_{g,n}$ by permuting
+    the marked points, and $\psi_i \mapsto \psi_{\sigma(i)}$ under this action.
+    \item \textbf{Log-concavity:} Follows from the Khovanskii--Teissier inequalities, since the
+    $\psi$-classes are nef.
+    \item \textbf{Positivity:} The $\psi$-classes are effective, and top intersections of nef
+    classes on a projective variety are positive.
+\end{itemize}
+
+Therefore, Theorem~\ref{thm:main} applies, yielding:
+
+\begin{corollary}[Extremal Descendants]
+The descendant integral $\langle \tau_{e_1} \cdots \tau_{e_n} \rangle_g$ is:
+\begin{itemize}
+    \item Maximized when $(e_1, \ldots, e_n)$ is balanced
+    \item Minimized when $(e_1, \ldots, e_n)$ is concentrated
+\end{itemize}
+\end{corollary}
+
+\bibliographystyle{alpha}
+\bibliography{references}
+
+\end{document}
