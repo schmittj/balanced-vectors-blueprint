@@ -34,6 +34,15 @@ jobs:
       - name: Build Lean project
         run: lake build
 
+      - name: Build documentation
+        run: lake -Kenv=dev build BalancedVectors:docs
+
+      - name: Upload docs artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docs
+          path: .lake/build/doc
+
   build-blueprint:
     runs-on: ubuntu-latest
     needs: build-lean
@@ -62,7 +71,13 @@ jobs:
           leanblueprint pdf
           leanblueprint web
 
-      - name: Upload blueprint artifact
+      - name: Download docs artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docs
+          path: blueprint/web/docs
+
+      - name: Upload pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: blueprint/web
