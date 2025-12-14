@@ -7,13 +7,9 @@ package «balanced-vectors» where
     ⟨`autoImplicit, false⟩
   ]
 
+-- Using the exact mathlib commit where the code was developed
 require mathlib from git
-  "https://github.com/leanprover-community/mathlib4.git" @ "v4.14.0"
-
--- Note: If you need the latest mathlib features, you can use:
--- require mathlib from git
---   "https://github.com/leanprover-community/mathlib4.git" @ "master"
--- and update lean-toolchain to match mathlib's version
+  "https://github.com/leanprover-community/mathlib4.git" @ "26fffffcccd7299b26cf63fac902165bc553fd56"
 
 @[default_target]
 lean_lib «BalancedVectors» where
