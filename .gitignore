@@ -3,6 +3,8 @@
 /lake-packages/
 /build/
 /.cache/
+/docbuild/.lake/
+/docbuild/lake-manifest.json
 
 # Blueprint output
 /blueprint/web/

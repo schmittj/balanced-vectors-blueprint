@@ -1,0 +1,13 @@
+name = "docbuild"
+reservoir = false
+
+# Depend on the parent project
+[[require]]
+name = "balanced-vectors"
+path = ".."
+
+# Depend on doc-gen4
+[[require]]
+name = "doc-gen4"
+git = "https://github.com/leanprover/doc-gen4"
+rev = "main"
