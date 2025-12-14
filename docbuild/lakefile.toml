@@ -6,8 +6,8 @@ reservoir = false
 name = "balanced-vectors"
 path = ".."
 
-# Depend on doc-gen4
+# Depend on doc-gen4 (use version matching our Lean toolchain)
 [[require]]
 name = "doc-gen4"
 git = "https://github.com/leanprover/doc-gen4"
-rev = "main"
+rev = "v4.26.0"

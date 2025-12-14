@@ -37,7 +37,6 @@ jobs:
       - name: Build documentation
         run: |
           cd docbuild
-          lake update doc-gen4
           lake build BalancedVectors:docs
 
       - name: Upload docs artifact
