@@ -66,40 +66,40 @@ A \emph{symmetric log-concave function} on $E(n,d)$ is a function $D : E(n,d) \t
 \end{enumerate}
 \end{definition}
 
-\section{Main Results}
-
-\begin{theorem}[Maximized on Balanced]\label{thm:maximized_on_balanced}
-\lean{SymmetricLogConcaveFunction.maximized_on_balanced}
-\leanok
-\uses{def:symmetric_logconcave_function, def:balanced}
-Let $D$ be a symmetric log-concave function on $E(n,d)$. Then $D$ is maximized on balanced vectors: for any $e \in E(n,d)$ and any balanced $b \in E(n,d)$, we have $D(e) \leq D(b)$.
-\end{theorem}
-
-\begin{theorem}[Minimized on Concentrated]\label{thm:minimized_on_concentrated}
-\lean{SymmetricLogConcaveFunction.minimized_on_concentrated}
-\leanok
-\uses{def:symmetric_logconcave_function, def:concentrated}
-Let $D$ be a symmetric log-concave function on $E(n,d)$. Then $D$ is minimized on concentrated vectors: for any $e \in E(n,d)$ and any concentrated $c \in E(n,d)$, we have $D(e) \geq D(c)$.
-\end{theorem}
+\section{Main Result}
 
 \begin{theorem}[Main Theorem]\label{thm:main}
-\lean{main_theorem}
+\lean{main_theorem_paper}
 \leanok
-\uses{thm:maximized_on_balanced, thm:minimized_on_concentrated}
+\uses{def:symmetric_logconcave_function, def:balanced, def:concentrated, thm:maximized_on_balanced, thm:minimized_on_concentrated}
 Let $D : E(n,d) \to \mathbb{Q}$ be a function satisfying:
 \begin{enumerate}
-\item $S_n$-symmetry: $D(e \circ \sigma^{-1}) = D(e)$ for all permutations $\sigma$
-\item Log-concavity: $D(e)^2 \geq D(e - \delta_i + \delta_j) \cdot D(e + \delta_i - \delta_j)$
-\item Strict positivity: $D(e) > 0$
+\item \textbf{$S_n$-symmetry:} $D(e \circ \sigma^{-1}) = D(e)$ for all permutations $\sigma$
+\item \textbf{Log-concavity:} $D(e)^2 \geq D(e - \delta_i + \delta_j) \cdot D(e + \delta_i - \delta_j)$ for all $i \neq j$ with $e_i, e_j \geq 1$
+\item \textbf{Strict positivity:} $D(e) > 0$ for all $e$
 \end{enumerate}
 Then:
 \begin{itemize}
-\item \textbf{Maximum:} $D$ is maximized on balanced vectors
-\item \textbf{Minimum:} $D$ is minimized on concentrated vectors
+\item \textbf{Maximum:} There exists a balanced vector $b \in E(n,d)$ such that $D(e) \leq D(b)$ for all $e \in E(n,d)$.
+\item \textbf{Minimum:} There exists a concentrated vector $c \in E(n,d)$ such that $D(c) \leq D(e)$ for all $e \in E(n,d)$.
 \end{itemize}
 \end{theorem}
 
-\section{Key Lemmas}
+\section{Key Lemmas and Theorems}
+
+\begin{theorem}[Maximized on Balanced]\label{thm:maximized_on_balanced}
+\lean{exists_balanced_maximizer}
+\leanok
+\uses{def:symmetric_logconcave_function, def:balanced, lem:balanced_maximizes}
+Let $D$ be a symmetric log-concave function on $E(n,d)$. Then there exists a balanced vector $b \in E(n,d)$ such that $D(e) \leq D(b)$ for all $e \in E(n,d)$.
+\end{theorem}
+
+\begin{theorem}[Minimized on Concentrated]\label{thm:minimized_on_concentrated}
+\lean{exists_concentrated_minimizer}
+\leanok
+\uses{def:symmetric_logconcave_function, def:concentrated, lem:concentrated_minimizes}
+Let $D$ be a symmetric log-concave function on $E(n,d)$. Then there exists a concentrated vector $c \in E(n,d)$ such that $D(c) \leq D(e)$ for all $e \in E(n,d)$.
+\end{theorem}
 
 \begin{lemma}[Unimodal of Log-Concave Palindromic]\label{lem:unimodal}
 \lean{unimodal_of_logconcave_palindromic}
@@ -107,16 +107,16 @@ Then:
 If a sequence is log-concave and palindromic, then it is unimodal (non-decreasing up to the middle, then non-increasing).
 \end{lemma}
 
-\begin{lemma}[Balanced Maximizes]\label{lem:balanced_maximizes}
+\begin{lemma}[Balanced Maximizes (Pointwise)]\label{lem:balanced_maximizes}
 \lean{balanced_maximizes}
 \leanok
 \uses{def:balanced, lem:unimodal}
-For a symmetric log-concave function, balanced vectors achieve the maximum value.
+For a symmetric log-concave function $D$ and any $e \in E(n,d)$, there exists a balanced $b \in E(n,d)$ with $D(e) \leq D(b)$.
 \end{lemma}
 
-\begin{lemma}[Concentrated Minimizes]\label{lem:concentrated_minimizes}
+\begin{lemma}[Concentrated Minimizes (Pointwise)]\label{lem:concentrated_minimizes}
 \lean{concentrated_minimizes}
 \leanok
 \uses{def:concentrated, lem:unimodal}
-For a symmetric log-concave function, concentrated vectors achieve the minimum value.
+For a symmetric log-concave function $D$ and any $e \in E(n,d)$, there exists a concentrated $c \in E(n,d)$ with $D(c) \leq D(e)$.
 \end{lemma}

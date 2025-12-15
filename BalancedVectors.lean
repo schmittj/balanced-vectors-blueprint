@@ -34,42 +34,50 @@ Then:
 
 | Definition              | Location | Informal meaning                              |
 |-------------------------|----------|-----------------------------------------------|
-| `WeakComposition n d`   | line 112 | n-tuple `e : Fin n → ℤ` with `∑eᵢ = d`, `eᵢ ≥ 0` |
-| `IsBalanced e`          | line 196 | `∀ i j, eᵢ ≤ eⱼ + 1 ∧ eⱼ ≤ eᵢ + 1`           |
-| `IsConcentrated d e`    | line 200 | `∃ k, eᵢ = if i = k then d else 0`           |
-| `IsSymmetric D`         | line 342 | `D(e ∘ σ⁻¹) = D(e)` for all `σ ∈ Sₙ`         |
-| `SatisfiesLogConcavity D` | line 351 | the log-concavity condition above          |
-| `IsStrictlyPositive D`  | line 357 | `D(e) > 0` for all `e`                       |
+| `WeakComposition n d`   | line 128 | n-tuple `e : Fin n → ℤ` with `∑eᵢ = d`, `eᵢ ≥ 0` |
+| `IsBalanced e`          | line 214 | `∀ i j, eᵢ ≤ eⱼ + 1 ∧ eⱼ ≤ eᵢ + 1`           |
+| `IsConcentrated d e`    | line 218 | `∃ k, eᵢ = if i = k then d else 0`           |
+| `IsSymmetric D`         | line 400 | `D(e ∘ σ⁻¹) = D(e)` for all `σ ∈ Sₙ`         |
+| `SatisfiesLogConcavity D` | line 409 | the log-concavity condition above          |
+| `IsStrictlyPositive D`  | line 415 | `D(e) > 0` for all `e`                       |
 
 ## Main Theorems (for verification)
 
-**Primary reference (clean formulation at end of file):**
+**Paper-style formulation (recommended for citation):**
 
 | Theorem                 | Location   | Statement                                    |
 |-------------------------|------------|----------------------------------------------|
-| `main_theorem`          | line 1108  | Combined statement of both results           |
-| `maximized_on_balanced` | line 1081  | `∀ e, ∃ e', IsBalanced e' ∧ D(e) ≤ D(e')`   |
-| `minimized_on_concentrated` | line 1095 | `∀ e, ∃ e', IsConcentrated e' ∧ D(e') ≤ D(e)`|
+| `main_theorem_paper`    | line 1238  | Combined: ∃ balanced max ∧ ∃ concentrated min |
+| `exists_balanced_maximizer` | line 1183 | `∃ b, IsBalanced b ∧ ∀ e, D(e) ≤ D(b)`   |
+| `exists_concentrated_minimizer` | line 1210 | `∃ c, IsConcentrated c ∧ ∀ e, D(c) ≤ D(e)` |
+
+**Original formulation (pointwise):**
+
+| Theorem                 | Location   | Statement                                    |
+|-------------------------|------------|----------------------------------------------|
+| `main_theorem`          | line 1166  | `∀ e, ∃ bal with D(e) ≤ D(bal)` ∧ vice versa |
+| `maximized_on_balanced` | line 1139  | `∀ e, ∃ e', IsBalanced e' ∧ D(e) ≤ D(e')`   |
+| `minimized_on_concentrated` | line 1153 | `∀ e, ∃ e', IsConcentrated e' ∧ D(e') ≤ D(e)` |
 
 **Supporting structure:**
 
 | Definition                      | Location   | Purpose                                |
 |---------------------------------|------------|----------------------------------------|
-| `SymmetricLogConcaveFunction`   | line 1059  | Bundles D with its three properties    |
+| `SymmetricLogConcaveFunction`   | line 1117  | Bundles D with its three properties    |
 
 **Implementation (used by the above):**
 
 | Theorem                 | Location  | Statement                                    |
 |-------------------------|-----------|----------------------------------------------|
-| `balanced_maximizes`    | line 660  | Core proof for maximum result                |
-| `concentrated_minimizes`| line 964  | Core proof for minimum result                |
+| `balanced_maximizes`    | line 718  | Core proof for maximum result                |
+| `concentrated_minimizes`| line 1022 | Core proof for minimum result                |
 
 ## Proof Strategy
 
 1. **Slice analysis**: For fixed i ≠ j, the "slice sequence" `s(t) = D(composition with
    eᵢ = t, eⱼ = q - t)` is shown to be log-concave and palindromic.
 
-2. **Unimodality lemma** (`unimodal_of_logconcave_palindromic`, line 248): Log-concave
+2. **Unimodality lemma** (`unimodal_of_logconcave_palindromic`, line 306): Log-concave
    palindromic sequences on `[0,q]` are unimodal (increasing then decreasing around q/2).
 
 3. **Balancing increases D**: When `eᵢ - eⱼ ≥ 2`, the modification `eᵢ ↦ eᵢ - 1`,
@@ -206,7 +214,7 @@ lemma modify_at_other (e : WeakComposition n d) (i j k : Fin n) (hi : 1 ≤ e i)
 
 end WeakComposition
 
-variable {d : ℤ}
+variable {n : ℕ} {d : ℤ}
 
 /-! ### Balanced and Concentrated Vectors -/
 
@@ -217,6 +225,46 @@ def IsBalanced (e : Fin n → ℤ) : Prop :=
 /-- A vector is concentrated if it equals `d • δₖ` for some `k`. -/
 def IsConcentrated (d : ℤ) (e : Fin n → ℤ) : Prop :=
   ∃ k, ∀ i, e i = if i = k then d else 0
+
+/-! ### Finiteness of Weak Compositions -/
+
+/-- Each entry of a weak composition is bounded by d. -/
+lemma WeakComposition.entry_le_d (e : WeakComposition n d) (i : Fin n) : e i ≤ d := by
+  -- Use Finset.single_le_sum: e i ≤ ∑ j, e j = d
+  have h := Finset.single_le_sum (fun j _ => e.nonneg j) (Finset.mem_univ i)
+  linarith [e.sum_eq]
+
+/-- The domain WeakComposition n d is finite when d ≥ 0.
+    Each entry satisfies 0 ≤ e i ≤ d, so we can inject into Fin n → Fin (d.toNat + 1). -/
+instance WeakComposition.finite (hd : 0 ≤ d) : Finite (WeakComposition n d) := by
+  classical
+  -- Inject into (Fin n → Fin (d.toNat + 1)), which is finite
+  let bound := d.toNat + 1
+  let f : WeakComposition n d → (Fin n → Fin bound) := fun e i =>
+    ⟨(e i).toNat, by
+      have hle := WeakComposition.entry_le_d e i
+      have hnonneg := e.nonneg i
+      omega⟩
+  apply Finite.of_injective f
+  intro e₁ e₂ heq
+  ext i
+  have h : (f e₁) i = (f e₂) i := congrFun heq i
+  simp only [f, Fin.mk.injEq] at h
+  have h1 := e₁.nonneg i
+  have h2 := e₂.nonneg i
+  omega
+
+/-- WeakComposition n d is nonempty when n > 0 and d ≥ 0. -/
+lemma WeakComposition.nonempty (hn : 0 < n) (hd : 0 ≤ d) : Nonempty (WeakComposition n d) := by
+  classical
+  -- The "all mass at index 0" vector works
+  refine ⟨⟨fun i => if i = ⟨0, hn⟩ then d else 0, ?_, ?_⟩⟩
+  · -- sum_eq: ∑ i, (if i = 0 then d else 0) = d
+    simp only [Finset.sum_ite_eq', Finset.mem_univ, ↓reduceIte]
+  · -- nonneg
+    intro i
+    show 0 ≤ if i = ⟨0, hn⟩ then d else 0
+    split_ifs <;> omega
 
 /-! ### Log-Concave and Palindromic Sequences -/
 
@@ -1118,7 +1166,7 @@ theorem minimized_on_concentrated (hn : 0 < n) (hd : 0 ≤ d)
 end SymmetricLogConcaveFunction
 
 /--
-**Combined Main Theorem.**
+**Combined Main Theorem (Original formulation).**
 For any symmetric log-concave function D on weak compositions E(n,d):
 - The maximum of D is achieved on balanced vectors
 - The minimum of D is achieved on concentrated vectors
@@ -1127,3 +1175,75 @@ theorem main_theorem (hn : 0 < n) (hd : 0 ≤ d) (F : SymmetricLogConcaveFunctio
     (∀ e, ∃ e_bal, IsBalanced e_bal.toFun ∧ F.D e ≤ F.D e_bal) ∧
     (∀ e, ∃ e_conc, IsConcentrated d e_conc.toFun ∧ F.D e_conc ≤ F.D e) :=
   ⟨F.maximized_on_balanced, F.minimized_on_concentrated hn hd⟩
+
+/--
+**Main Theorem (Paper formulation - Maximum).**
+There exists a balanced vector that maximizes D over all of E(n,d).
+
+This formulation matches the informal statement: "D is maximized on balanced vectors."
+
+*Proof strategy (Option B from GPT-5.2):*
+1. The domain is finite, so a global maximizer eMax exists
+2. By maximized_on_balanced, there's balanced b with D(eMax) ≤ D(b)
+3. But eMax is globally maximal, so D(b) ≤ D(eMax)
+4. Hence D(b) = D(eMax), and b is a balanced global maximizer
+-/
+theorem exists_balanced_maximizer (hn : 0 < n) (hd : 0 ≤ d)
+    (F : SymmetricLogConcaveFunction n d) :
+    ∃ b : WeakComposition n d, IsBalanced b.toFun ∧ ∀ e, F.D e ≤ F.D b := by
+  classical
+  haveI : Finite (WeakComposition n d) := WeakComposition.finite hd
+  haveI : Nonempty (WeakComposition n d) := WeakComposition.nonempty hn hd
+  -- Get a global maximizer using finiteness
+  obtain ⟨eMax, heMax⟩ := Finite.exists_max F.D
+  -- Apply maximized_on_balanced to get balanced b with D(eMax) ≤ D(b)
+  obtain ⟨b, hb_bal, hD_le⟩ := F.maximized_on_balanced eMax
+  -- Since eMax is global max, D(b) ≤ D(eMax), so D(b) = D(eMax)
+  have hD_ge : F.D b ≤ F.D eMax := heMax b
+  have hD_eq : F.D b = F.D eMax := le_antisymm hD_ge hD_le
+  -- b is the balanced global maximizer
+  use b, hb_bal
+  intro e
+  calc F.D e ≤ F.D eMax := heMax e
+       _ = F.D b := hD_eq.symm
+
+/--
+**Main Theorem (Paper formulation - Minimum).**
+There exists a concentrated vector that minimizes D over all of E(n,d).
+
+This formulation matches the informal statement: "D is minimized on concentrated vectors."
+
+*Proof strategy:* Same as maximum but with global minimizer.
+-/
+theorem exists_concentrated_minimizer (hn : 0 < n) (hd : 0 ≤ d)
+    (F : SymmetricLogConcaveFunction n d) :
+    ∃ c : WeakComposition n d, IsConcentrated d c.toFun ∧ ∀ e, F.D c ≤ F.D e := by
+  classical
+  haveI : Finite (WeakComposition n d) := WeakComposition.finite hd
+  haveI : Nonempty (WeakComposition n d) := WeakComposition.nonempty hn hd
+  -- Get a global minimizer using finiteness
+  obtain ⟨eMin, heMin⟩ := Finite.exists_min F.D
+  -- Apply minimized_on_concentrated to get concentrated c with D(c) ≤ D(eMin)
+  obtain ⟨c, hc_conc, hD_le⟩ := F.minimized_on_concentrated hn hd eMin
+  -- Since eMin is global min, D(eMin) ≤ D(c), so D(c) = D(eMin)
+  have hD_ge : F.D eMin ≤ F.D c := heMin c
+  have hD_eq : F.D c = F.D eMin := le_antisymm hD_le hD_ge
+  -- c is the concentrated global minimizer
+  use c, hc_conc
+  intro e
+  calc F.D c = F.D eMin := hD_eq
+       _ ≤ F.D e := heMin e
+
+/--
+**Main Theorem (Paper formulation - Combined).**
+For any symmetric log-concave function D on weak compositions E(n,d):
+- There exists a balanced vector b such that D(b) ≥ D(e) for all e
+- There exists a concentrated vector c such that D(c) ≤ D(e) for all e
+
+This is the natural formalization matching the paper's statement:
+"D is maximized on balanced vectors and minimized on concentrated vectors."
+-/
+theorem main_theorem_paper (hn : 0 < n) (hd : 0 ≤ d) (F : SymmetricLogConcaveFunction n d) :
+    (∃ b, IsBalanced b.toFun ∧ ∀ e, F.D e ≤ F.D b) ∧
+    (∃ c, IsConcentrated d c.toFun ∧ ∀ e, F.D c ≤ F.D e) :=
+  ⟨exists_balanced_maximizer hn hd F, exists_concentrated_minimizer hn hd F⟩
