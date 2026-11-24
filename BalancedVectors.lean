@@ -1,5 +1,5 @@
 /-
-Copyright (c) 2024. All rights reserved.
+Copyright (c) 2025 Johannes Schmitt. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 -/
 import Mathlib.Data.Fin.Basic
